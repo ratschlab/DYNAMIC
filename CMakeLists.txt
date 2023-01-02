@@ -34,6 +34,13 @@ include_directories(${PROJECT_SOURCE_DIR}/include/algorithms)
 include_directories(${PROJECT_SOURCE_DIR}/include/algorithms/cw-bwt)
 include_directories(${INSTALL_DIR}/src/hopscotch_map/include)
 
+add_library(XXSDS_DYNAMIC INTERFACE)
+
+target_include_directories(XXSDS_DYNAMIC INTERFACE
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+target_link_libraries(XXSDS_DYNAMIC INTERFACE)
+
 message("Building in ${CMAKE_BUILD_TYPE} mode")
 
 if(XXSDS_DYN_MULTI_THREADED)
@@ -46,6 +53,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g3 -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-ggdb -Ofast -fstrict-aliasing -DNDEBUG -march=native")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-g -ggdb -Ofast -fstrict-aliasing -march=native")
 
+if(XXSDS_DYN_BUILD)
 add_executable(debug debug.cpp)
 add_executable(rle_lz77_v1 rle_lz77_v1.cpp)
 add_executable(rle_lz77_v2 rle_lz77_v2.cpp)
@@ -61,4 +69,4 @@ add_dependencies(h0_lz77 hopscotch_map)
 add_dependencies(rle_bwt hopscotch_map)
 add_dependencies(cw-bwt hopscotch_map)
 add_dependencies(benchmark hopscotch_map)
-
+endif()
