@@ -625,10 +625,9 @@ namespace dyn{
 		uint64_t nr_right_ints = size_ - nr_left_ints;
 
 		uint64_t nr_left_words = (nr_left_ints/int_per_word_) + (nr_left_ints%int_per_word_!=0);
-		uint64_t nr_right_words = tot_words-nr_left_words;
 
 		assert(nr_left_words>0);
-		assert(nr_right_words>0);
+		assert(tot_words>nr_left_words);
 
 		assert(size_ > nr_left_ints);
 		assert(words.begin() + nr_left_words + extra_ < words.end());
