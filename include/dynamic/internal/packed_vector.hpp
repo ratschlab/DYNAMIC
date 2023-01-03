@@ -617,7 +617,9 @@ namespace dyn{
                    || !(words[words.size()-1] >> ((size_ % int_per_word_) * width_)))
                && "uninitialized non-zero values in the end of the vector");
 
+#ifndef NDEBUG
 		uint64_t tot_words = (size_/int_per_word_) + (size_%int_per_word_!=0);
+#endif
 
 		assert(tot_words <= words.size());
 
