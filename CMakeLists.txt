@@ -14,33 +14,27 @@ endif()
 
 project (dynamic)
 
-include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
-
-# hopscotch_map
-ExternalProject_Add(hopscotch_map
-  GIT_REPOSITORY "https://github.com/Tessil/hopscotch-map.git"
-  BUILD_IN_SOURCE TRUE
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=${INSTALL_DIR} # TODO ADD static build flag
-  UPDATE_COMMAND ""
-  INSTALL_COMMAND ""
-  BUILD_COMMAND ""
-  CONFIGURE_COMMAND "")
-ExternalProject_Get_property(hopscotch_map INSTALL_DIR)
-set(hopscotch_map_INCLUDE "${INSTALL_DIR}/src/hopscotch_map/include/")
-
-include_directories(${PROJECT_SOURCE_DIR}/include)
-#include_directories(${PROJECT_SOURCE_DIR}/include/dynamic)
-#include_directories(${PROJECT_SOURCE_DIR}/include/dynamic/internal)
-#include_directories(${PROJECT_SOURCE_DIR}/include/dynamic/algorithms)
-#include_directories(${PROJECT_SOURCE_DIR}/include/dynamic/algorithms/cw-bwt)
-include_directories(${INSTALL_DIR}/src/hopscotch_map/include)
-
 add_library(XXSDS_DYNAMIC INTERFACE)
-
+target_compile_features(XXSDS_DYNAMIC INTERFACE cxx_std_11)
 target_include_directories(XXSDS_DYNAMIC INTERFACE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-target_link_libraries(XXSDS_DYNAMIC INTERFACE)
+
+if(TARGET tsl::hopscotch_map)
+  target_link_libraries(XXSDS_DYNAMIC INTERFACE tsl::hopscotch_map)
+else()
+  include(ExternalProject)
+  ExternalProject_Add(hopscotch_map
+    GIT_REPOSITORY "https://github.com/Tessil/hopscotch-map.git"
+    BUILD_IN_SOURCE TRUE
+    UPDATE_COMMAND ""
+    INSTALL_COMMAND ""
+    BUILD_COMMAND ""
+    CONFIGURE_COMMAND "")
+  ExternalProject_Get_property(hopscotch_map SOURCE_DIR)
+  target_include_directories(XXSDS_DYNAMIC INTERFACE "$<BUILD_INTERFACE:${SOURCE_DIR}/include>")
+  add_dependencies(XXSDS_DYNAMIC hopscotch_map)
+endif()
 
 if(XXSDS_DYN_BUILD)
 message("Building in ${CMAKE_BUILD_TYPE} mode")
@@ -65,12 +59,7 @@ add_executable(cw-bwt cw-bwt.cpp)
 add_executable(benchmark benchmark.cpp)
 add_executable(wm_string wm_string.cpp)
 
-add_dependencies(debug hopscotch_map)
-add_dependencies(rle_lz77_v1 hopscotch_map)
-add_dependencies(rle_lz77_v2 hopscotch_map)
-add_dependencies(h0_lz77 hopscotch_map)
-add_dependencies(rle_bwt hopscotch_map)
-add_dependencies(cw-bwt hopscotch_map)
-add_dependencies(benchmark hopscotch_map)
-add_dependencies(wm_string hopscotch_map)
+foreach(tool debug rle_lz77_v1 rle_lz77_v2 h0_lz77 rle_bwt cw-bwt benchmark wm_string)
+  target_link_libraries(${tool} PRIVATE XXSDS_DYNAMIC)
+endforeach()
 endif()
