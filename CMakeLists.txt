@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 2.6)
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+cmake_minimum_required(VERSION 2.8...3.13)
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
 
 option(USE_OPENMP "Enable multi-threading" OFF)
 
@@ -15,7 +16,7 @@ endif()
 project (dynamic)
 
 add_library(XXSDS_DYNAMIC INTERFACE)
-target_compile_features(XXSDS_DYNAMIC INTERFACE cxx_std_11)
+target_compile_features(XXSDS_DYNAMIC INTERFACE cxx_std_17)
 target_include_directories(XXSDS_DYNAMIC INTERFACE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
     "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
@@ -38,7 +39,6 @@ endif()
 
 if(XXSDS_DYN_BUILD)
 message("Building in ${CMAKE_BUILD_TYPE} mode")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11")
 
 if(XXSDS_DYN_MULTI_THREADED)
   find_package(OpenMP REQUIRED)
