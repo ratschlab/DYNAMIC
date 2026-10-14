@@ -1342,8 +1342,8 @@ class spsi<leaf_type, B_LEAF, B>::node {
 
     in.read((char*)&leaves_len, sizeof(leaves_len));
 
-    assert(subtree_sizes_len > 0);
-    assert(subtree_psums_len > 0);
+    if (!in)
+      throw std::ifstream::failure("failed to read SPSI node header");
 
     if (subtree_sizes_len != subtree_sizes.size()
           || subtree_psums_len != subtree_psums.size())
