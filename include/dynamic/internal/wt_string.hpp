@@ -151,7 +151,7 @@ class wt_string {
                        [&](typename Vector::value_type c) { return ae.char_exists(c); }));
 
     #pragma omp parallel
-    #pragma omp master
+    #pragma omp single
     root.push_many(path_to_leaf, values);
     n += values.size();
   }
@@ -169,7 +169,7 @@ class wt_string {
     }
 
     #pragma omp parallel
-    #pragma omp master
+    #pragma omp single
     root.push_many(path_to_leaf, values);
     n += values.size();
   }
